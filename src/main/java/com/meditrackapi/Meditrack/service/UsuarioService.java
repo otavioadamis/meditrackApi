@@ -9,6 +9,7 @@ import com.meditrackapi.Meditrack.domain.Interfaces.IAuthenticationService;
 import com.meditrackapi.Meditrack.domain.Interfaces.IUsuarioService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -66,15 +67,8 @@ public class UsuarioService implements IUsuarioService {
                     userLogin.email(),
                     userLogin.senha()
             );
-            _authenticationManager.authenticate(authenticationToken);
-        Usuario usuario = (Usuario) authenticationToken.getPrincipal();
-
-        //TODO nao sei se a forma que eu decidi fazer eh tao bom assim, entao vou deixar comentado para futuramente.
-                /*Usuario usuario = _usuarioRepo.findByEmail(userLogin.email());
-                boolean isPasswordMatch = _passwordEncoder.matches(userLogin.senha(), usuario.getSenha());
-                if(!isPasswordMatch){
-                    throw new IllegalArgumentException("Senha incorreta.");
-                }*/
+            Authentication auth = _authenticationManager.authenticate(authenticationToken);
+            Usuario usuario = (Usuario) auth.getPrincipal();
 
         String jwtToken = _authService.createToken(usuario);
 

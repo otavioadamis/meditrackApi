@@ -30,9 +30,4 @@ public class UsuarioController {
         LoginResponseDTO response = _usuarioService.login(userLogin);
         return  ResponseEntity.ok(response);
     }
-
-    @GetMapping("/auth")
-    public ResponseEntity teste(){
-        return ResponseEntity.ok("bla");
-    }
 }

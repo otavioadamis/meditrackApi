@@ -34,7 +34,8 @@ public class SecurityMiddleware extends OncePerRequestFilter {
             String id = _authService.validateToken(token);
             Optional<Usuario> usuario = _usuarioRepo.findById(id);
             if(usuario.isPresent()){
-                var authentication = new UsernamePasswordAuthenticationToken(usuario, null);
+                UserDetails userDetails = usuario.get();
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         }
