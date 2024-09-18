@@ -33,6 +33,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/api/usuario/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/usuario/cadastro").permitAll()
+                        .requestMatchers("/v3/api-docs/**", "swagger-ui/**", "swagger-ui.html", "swagger/index.html").permitAll()
                 )
                 .addFilterBefore(_securityMiddleware, UsernamePasswordAuthenticationFilter.class)
                 .build();
