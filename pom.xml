@@ -105,6 +105,7 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<finalName>meditrack-project</finalName>
 	</build>
 
 </project>
