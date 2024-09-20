@@ -4,10 +4,13 @@ import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.LoginResponseDTO;
 import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.PostUsuarioDTO;
 import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.UserLoginDTO;
 import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.UsuarioResponseDTO;
+import com.meditrackapi.Meditrack.domain.Entities.Usuario;
 import com.meditrackapi.Meditrack.domain.Interfaces.IUsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuario")
@@ -29,5 +32,11 @@ public class UsuarioController {
     public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid UserLoginDTO userLogin){
         LoginResponseDTO response = _usuarioService.login(userLogin);
         return  ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/listar")
+    public ResponseEntity<List<Usuario>> listarTodosUsuarios() {
+        List<Usuario> usuarios = _usuarioService.listarTodosUsuarios();
+        return ResponseEntity.ok(usuarios);
     }
 }

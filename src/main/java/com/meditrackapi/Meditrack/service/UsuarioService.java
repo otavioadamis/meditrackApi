@@ -1,4 +1,5 @@
 package com.meditrackapi.Meditrack.service;
+
 import com.meditrackapi.Meditrack.dao.Repositories.UsuarioRepository;
 import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.LoginResponseDTO;
 import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.PostUsuarioDTO;
@@ -12,6 +13,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class UsuarioService implements IUsuarioService {
@@ -33,6 +36,7 @@ public class UsuarioService implements IUsuarioService {
         _passwordEncoder = passwordEncoder;
     }
 
+    @Override
     public LoginResponseDTO cadastrarUsuario(PostUsuarioDTO novoUsuario)
     {
         Usuario checkEmailAndCpf = _usuarioRepo.findByEmailOrCpf(novoUsuario.email(), novoUsuario.cpf());
@@ -61,6 +65,7 @@ public class UsuarioService implements IUsuarioService {
         );
     }
 
+    @Override
     public LoginResponseDTO login(UserLoginDTO userLogin)
     {
             UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -84,5 +89,10 @@ public class UsuarioService implements IUsuarioService {
                 jwtToken,
                 usuarioResponse
         );
+    }
+
+    @Override
+    public List<Usuario> listarTodosUsuarios() {
+        return _usuarioRepo.findAll();
     }
 }
