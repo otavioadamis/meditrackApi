@@ -38,8 +38,8 @@ faça isso de acordo com a sua maquina
     mvn spring-boot:run
 
 5. **Acesse a aplicação**
-    - No momento está disponivel apenas os testes de api, que podem ser testados acessando:
-    http://localhost:8080/swagger-ui/index.html
+- No momento está disponivel apenas os testes de api, que podem ser testados acessando:
+http://localhost:8080/swagger-ui/index.html
 
 ## Endpoints da API
 **Cadastro de Usuário**
