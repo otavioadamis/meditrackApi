@@ -42,7 +42,7 @@ faça isso de acordo com a sua maquina
     http://localhost:8080/swagger-ui/index.html
 
 ## Endpoints da API
-**Cadastro de usuário**
+**Cadastro de Usuário**
 - URL: /api/usuario/cadastro
 - Método: POST
 - Corpo da Requisição
