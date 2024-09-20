@@ -54,6 +54,18 @@ http://localhost:8080/swagger-ui/index.html
   "senha": "sua_senha",
   "dataNascimento": "2000-01-03T00:00:00.000Z"
     }
+- Resposta:
+  ```sh
+     {
+     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJNZWRpdHJhY2stYXBpIiwic3ViIjoiMGNlNzdlYTYtZDU2MC00ZWM4LTgwMTctOTRlYTQzMjU5OTE1IiwiZXhwIjoxNzI2ODcwMzk4fQ.fTwEtbkXef_FfRx5mr5__Tz--leewx7CnH5rPoJaUh0",
+     "usuario": {
+       "id": "0ce77ea6-d560-4ec8-8017-94ea43259915",
+       "nomeCompleto": "teste2",
+       "email": "teste2",
+       "cpf": "teste2",
+       "fotoPerfil": "dev-teste"
+     }
+   }
 
 **Login de Usuário**
 - URL: /api/usuario/login
@@ -64,6 +76,18 @@ http://localhost:8080/swagger-ui/index.html
   "email": "seu.email@example.com",
   "senha": "sua_senha"
     }
+- Resposta:
+  ```sh
+  {
+     "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJNZWRpdHJhY2stYXBpIiwic3ViIjoiZWJkODA1MzktZjJhMi00OTQ2LWFmZTktYTAxZGU2MGZmMTEyIiwiZXhwIjoxNzI2ODcwNDYwfQ.ZHWQiQ6BQHkidiyKQheX0NrVLmkYhP9a9-UZn1zw07Y",
+     "usuario": {
+       "id": "ebd80539-f2a2-4946-afe9-a01de60ff112",
+       "nomeCompleto": "teste",
+       "email": "teste@teste.com",
+       "cpf": "teste",
+       "fotoPerfil": "dev-teste"
+     }
+   }
 
 **Listar todos os Usuários**
 - URL: /api/usuario/listar
