@@ -33,7 +33,9 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/api/usuario/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/usuario/cadastro").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/usuario/listar").permitAll() // Adicione esta linha
                         .requestMatchers("/v3/api-docs/**", "swagger-ui/**", "swagger-ui.html", "swagger/index.html").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .addFilterBefore(_securityMiddleware, UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -48,6 +50,4 @@ public class SecurityConfiguration {
     public PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-
-
 }
