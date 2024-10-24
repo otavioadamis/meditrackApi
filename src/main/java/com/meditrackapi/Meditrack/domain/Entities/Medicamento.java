@@ -21,9 +21,11 @@ public class Medicamento {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
     private int codigo;
+    private String lote;
     private String produto;
     private String tipo;
     private Date vencimento;
+    private boolean necessitaReceita;
     @ManyToMany
     @JoinTable(name = "medicamento_posto",
             joinColumns = @JoinColumn(name = "medicamento_id"),

@@ -1,9 +1,11 @@
 CREATE TABLE medicamento (
     id VARCHAR(255) DEFAULT gen_random_uuid() PRIMARY KEY,
     codigo int NOT NULL,
+    lote VARCHAR(255) NOT NULL,
     produto VARCHAR(255) NOT NULL,
-    tipo VARCHAR(30) NOT NULL,
-    vencimento DATE NOT NULL
+    tipo VARCHAR(255) NOT NULL,
+    vencimento DATE NOT NULL,
+    necessita_receita BOOLEAN NOT NULL DEFAULT false
 );
 
 CREATE TABLE posto (
