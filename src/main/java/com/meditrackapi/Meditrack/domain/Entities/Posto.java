@@ -19,7 +19,7 @@ public class Posto {
     private String nome;
     private String bairro;
     private String rua;
-    private int numero;
+    private String numero;
     private String linhasOnibus;
     private String telefone;
 }
