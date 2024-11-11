@@ -1,10 +1,7 @@
 package com.meditrackapi.Meditrack.service;
 
 import com.meditrackapi.Meditrack.dao.Repositories.UsuarioRepository;
-import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.LoginResponseDTO;
-import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.PostUsuarioDTO;
-import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.UserLoginDTO;
-import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.UsuarioResponseDTO;
+import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.*;
 import com.meditrackapi.Meditrack.domain.Entities.Usuario;
 import com.meditrackapi.Meditrack.domain.Interfaces.IAuthenticationService;
 import com.meditrackapi.Meditrack.domain.Interfaces.IUsuarioService;
@@ -62,6 +59,25 @@ public class UsuarioService implements IUsuarioService {
         return new LoginResponseDTO(
                 jwtToken,
                 usuarioResponse
+        );
+    }
+
+    public UsuarioResponseDTO editarUsuario(EditUsuarioDTO usuarioInfos){
+        Usuario usuario = _usuarioRepo.findById(usuarioInfos.usuarioId())
+                .orElseThrow(()-> new IllegalArgumentException("Não foi possível encontrar o usuário."));
+
+        usuario.setEmail(usuarioInfos.novoEmail());
+        usuario.setNomeCompleto(usuarioInfos.novoNome());
+        usuario.setDataNascimento(usuarioInfos.novaDataNascimento());
+
+        _usuarioRepo.save(usuario);
+
+        return new UsuarioResponseDTO(
+                usuario.getId(),
+                usuario.getNomeCompleto(),
+                usuario.getEmail(),
+                usuario.getCpf(),
+                usuario.getFotoPerfil()
         );
     }
 
