@@ -1,25 +1,41 @@
 package com.meditrackapi.Meditrack.service;
 
+import com.meditrackapi.Meditrack.dao.Repositories.MedicamentoPostoRepository;
 import com.meditrackapi.Meditrack.dao.Repositories.MedicamentoRepository;
 import com.meditrackapi.Meditrack.dao.Repositories.PostoRepository;
-import com.meditrackapi.Meditrack.domain.DTOs.MedicamentoTOs.Response.ListaMedsResponse;
-import com.meditrackapi.Meditrack.domain.DTOs.MedicamentoTOs.Response.MedicamentoResponse;
+import com.meditrackapi.Meditrack.domain.DTOs.MedicamentoTOs.Response.*;
 import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.ListaPostosResponse;
 import com.meditrackapi.Meditrack.domain.Entities.Medicamento;
+import com.meditrackapi.Meditrack.domain.Entities.Usuario;
 import com.meditrackapi.Meditrack.domain.Interfaces.IMedicamentoService;
+import com.opencsv.bean.CsvToBean;
+import com.opencsv.bean.CsvToBeanBuilder;
+import com.opencsv.bean.HeaderColumnNameMappingStrategy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class MedicamentoService implements IMedicamentoService {
 
+    private final MedicamentoPostoRepository _medPostoRepo;
     private final MedicamentoRepository _medicamentoRepo;
     private final PostoRepository _postoRepo;
-    public MedicamentoService(MedicamentoRepository medicamentoRepository, PostoRepository postoRepository){
+    public MedicamentoService(MedicamentoRepository medicamentoRepository, PostoRepository postoRepository, MedicamentoPostoRepository medicamentoPostoRepository){
         _medicamentoRepo = medicamentoRepository;
         _postoRepo = postoRepository;
+        _medPostoRepo = medicamentoPostoRepository;
     }
 
     @Override
@@ -43,5 +59,71 @@ public class MedicamentoService implements IMedicamentoService {
                 medicamento.isNecessitaReceita(),
                 postos
             );
+    }
+
+    public Integer InserirCargaMedicamentos(MultipartFile file) throws IOException {
+        Set<Medicamento> medicamentos = parseCsv(file);
+        _medicamentoRepo.saveAll(medicamentos);
+        return medicamentos.size();
+    }
+
+    public Integer AtualizarEstoque(MultipartFile file, String funcionarioId) throws IOException {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuario funcionario = (Usuario) authentication.getPrincipal();
+        String postoId = funcionario.getPosto().getId();
+
+        Set<UpdateEstoqueCsvReprensentation> medicamentos = parseEstoqueCsv(file);
+
+        int updatesCount = 0;
+        for (UpdateEstoqueCsvReprensentation csvLine : medicamentos) {
+            Optional<Medicamento> medicamentoOpt = _medicamentoRepo.findByCodigo(csvLine.get_codigo());
+            if (medicamentoOpt.isPresent()) {
+                Medicamento medicamento = medicamentoOpt.get();
+                updatesCount += _medPostoRepo.updateQuantidadeEstoque(postoId, medicamento.getId(), csvLine.get_quantidade());
+            }
+        }
+        return updatesCount;
+    }
+
+    public List<MedicamentoCard> listarMedicamentosPorPosto(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Usuario funcionario = (Usuario) authentication.getPrincipal();
+        String postoId = funcionario.getPosto().getId();
+
+
+    }
+
+    private Set<Medicamento> parseCsv(MultipartFile file) throws IOException {
+        try(Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            HeaderColumnNameMappingStrategy<MedicamentoCsvRepresentation> strategy =
+                    new HeaderColumnNameMappingStrategy<>();
+            strategy.setType(MedicamentoCsvRepresentation.class);
+            CsvToBean<MedicamentoCsvRepresentation> csvToBean =
+                    new CsvToBeanBuilder<MedicamentoCsvRepresentation>(reader)
+                            .withMappingStrategy(strategy)
+                            .withIgnoreEmptyLine(true)
+                            .withIgnoreLeadingWhiteSpace(true)
+                            .build();
+            return csvToBean.parse()
+                    .stream()
+                    .map(csvLine -> Medicamento.builder()
+                            .codigo(csvLine.get_codigo())
+                            .produto(csvLine.get_produto())
+                            .lote(csvLine.get_lote())
+                            .necessitaReceita(csvLine.is_necessita_receita())
+                            .vencimento(csvLine.get_vencimento())
+                            .build()
+                    ).collect(Collectors.toSet());
+        }
+    }
+
+    private Set<UpdateEstoqueCsvReprensentation> parseEstoqueCsv(MultipartFile file) throws IOException {
+        try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
+            return new HashSet<>(new CsvToBeanBuilder<UpdateEstoqueCsvReprensentation>(reader)
+                    .withType(UpdateEstoqueCsvReprensentation.class)
+                    .withIgnoreLeadingWhiteSpace(true)
+                    .build()
+                    .parse());
+        }
     }
 }

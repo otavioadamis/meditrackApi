@@ -15,11 +15,14 @@ public interface PostoRepository extends JpaRepository<Posto, String> {
                     "p.rua AS ruaPosto, " +
                     "p.numero AS numeroPosto, " +
                     "p.linhas_onibus AS linhasOnibus, " +
-                    "p.telefone AS telefone " +
+                    "p.telefone AS telefone, " +
+                    "mp.quantidade_estoque as quantidadeEstoque " +
                     "FROM posto p " +
                     "JOIN medicamento_posto mp ON p.id = mp.posto_id " +
                     "WHERE mp.medicamento_id = :id",
             nativeQuery = true
     )
     List<ListaPostosResponse> findPostosByMedicamentoId(@Param("id") String id);
+    @Query(value = "SELECT ")
+    String findPostoIdByFuncionarioId(@Param("funcionarioId") String funcionarioId);
 }

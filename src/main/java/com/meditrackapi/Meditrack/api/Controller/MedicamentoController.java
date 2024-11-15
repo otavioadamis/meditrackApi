@@ -32,4 +32,5 @@ public class MedicamentoController {
         MedicamentoResponse response = _medicamentoService.SearchById(id);
         return ResponseEntity.ok(response);
     }
+
 }

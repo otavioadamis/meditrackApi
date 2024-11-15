@@ -16,6 +16,7 @@ public interface MedicamentoRepository extends JpaRepository<Medicamento, String
 
     @Nonnull
     Optional<Medicamento> findById(@Nonnull String id);
+    Optional<Medicamento> findByCodigo(int codigo);
     @Query(
                     "SELECT med.id as medicamentoId, " +
                     "med.produto as nomeMedicamento, " +

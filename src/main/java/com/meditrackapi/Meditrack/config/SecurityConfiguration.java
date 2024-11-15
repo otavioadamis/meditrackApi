@@ -1,6 +1,7 @@
 package com.meditrackapi.Meditrack.config;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.http.parser.HttpParser;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -41,10 +42,12 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/api/usuario/login").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/usuario/cadastro").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/usuario/listar").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/usuario/listar").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/usuario/editar").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/medicamento/pesquisar/{nome}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/medicamento/{id}").permitAll()
-                        .requestMatchers(HttpMethod.PUT, "/api/usuario/editar").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/admin/upload-meds").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/funcionario/atualizar-estoque").hasRole("FUNCIONARIO")
                         .requestMatchers("/v3/api-docs/**", "swagger-ui/**", "swagger-ui.html", "swagger/index.html").permitAll()
                         .anyRequest().authenticated()
                 )

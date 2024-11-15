@@ -7,4 +7,5 @@ public interface ListaPostosResponse {
     String getNumeroPosto();
     String getLinhasOnibus();
     String getTelefone();
+    Integer getQuantidadeEstoque();
 }
