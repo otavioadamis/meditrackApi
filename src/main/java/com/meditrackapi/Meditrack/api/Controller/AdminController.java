@@ -22,8 +22,4 @@ public class AdminController {
         return ResponseEntity.ok(_medicamentoService.InserirCargaMedicamentos(file));
     }
 
-    @GetMapping("/listar-meds")
-    public ResponseEntity<> listarMedicamentosDoPosto(){
-
-    }
 }

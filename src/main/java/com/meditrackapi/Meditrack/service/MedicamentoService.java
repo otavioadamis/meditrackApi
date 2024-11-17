@@ -1,12 +1,11 @@
 package com.meditrackapi.Meditrack.service;
 
-import com.meditrackapi.Meditrack.dao.Repositories.MedicamentoPostoRepository;
-import com.meditrackapi.Meditrack.dao.Repositories.MedicamentoRepository;
-import com.meditrackapi.Meditrack.dao.Repositories.PostoRepository;
+import com.meditrackapi.Meditrack.dao.Repositories.*;
 import com.meditrackapi.Meditrack.domain.DTOs.MedicamentoTOs.Response.*;
 import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.ListaPostosResponse;
 import com.meditrackapi.Meditrack.domain.Entities.Medicamento;
 import com.meditrackapi.Meditrack.domain.Entities.Usuario;
+import com.meditrackapi.Meditrack.domain.Entities.auxiliar.UsuarioMedicamento;
 import com.meditrackapi.Meditrack.domain.Interfaces.IMedicamentoService;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -29,13 +28,22 @@ import java.util.stream.Collectors;
 @Service
 public class MedicamentoService implements IMedicamentoService {
 
+    private final UsuarioMedicamentoRepository _userMedRepo;
     private final MedicamentoPostoRepository _medPostoRepo;
     private final MedicamentoRepository _medicamentoRepo;
     private final PostoRepository _postoRepo;
-    public MedicamentoService(MedicamentoRepository medicamentoRepository, PostoRepository postoRepository, MedicamentoPostoRepository medicamentoPostoRepository){
+    private final UsuarioRepository _userRepo;
+    public MedicamentoService(MedicamentoRepository medicamentoRepository,
+                              PostoRepository postoRepository,
+                              MedicamentoPostoRepository medicamentoPostoRepository,
+                              UsuarioRepository usuarioRepository,
+                              UsuarioMedicamentoRepository usuarioMedicamentoRepository
+                              ){
         _medicamentoRepo = medicamentoRepository;
         _postoRepo = postoRepository;
         _medPostoRepo = medicamentoPostoRepository;
+        _userRepo = usuarioRepository;
+        _userMedRepo = usuarioMedicamentoRepository;
     }
 
     @Override
@@ -67,11 +75,11 @@ public class MedicamentoService implements IMedicamentoService {
         return medicamentos.size();
     }
 
-    public Integer AtualizarEstoque(MultipartFile file, String funcionarioId) throws IOException {
+    public Integer AtualizarEstoque(MultipartFile file) throws IOException {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Usuario funcionario = (Usuario) authentication.getPrincipal();
-        String postoId = funcionario.getPosto().getId();
-
+        String loggedInUserEmail = authentication.getName();
+        Usuario usuarioLogado = (Usuario) _userRepo.findByEmail(loggedInUserEmail);
+        String postoId = usuarioLogado.getPosto().getId();
         Set<UpdateEstoqueCsvReprensentation> medicamentos = parseEstoqueCsv(file);
 
         int updatesCount = 0;
@@ -87,10 +95,27 @@ public class MedicamentoService implements IMedicamentoService {
 
     public List<MedicamentoCard> listarMedicamentosPorPosto(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Usuario funcionario = (Usuario) authentication.getPrincipal();
-        String postoId = funcionario.getPosto().getId();
+        String loggedInUserEmail = authentication.getName();
+        Usuario usuarioLogado = (Usuario) _userRepo.findByEmail(loggedInUserEmail);
+        String postoId = usuarioLogado.getPosto().getId();
+        return _medicamentoRepo.findAllByPostoId(postoId);
+    }
 
+    public void favoritarMedicamento(String medicamentoId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+        Usuario usuarioLogado = (Usuario) _userRepo.findByEmail(loggedInUserEmail);
+        Medicamento medicamento = _medicamentoRepo.findById(medicamentoId)
+                .orElseThrow(()-> new IllegalArgumentException("Não foi possível encontrar o medicamento."));
+        UsuarioMedicamento usuarioMed = new UsuarioMedicamento(usuarioLogado, medicamento);
+        _userMedRepo.save(usuarioMed);
+    }
 
+    public List<MedicamentoCard> listarMedicamentosFavoritos(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+        Usuario usuarioLogado = (Usuario) _userRepo.findByEmail(loggedInUserEmail);
+        return _userMedRepo.findMedicamentosByUsuarioId(usuarioLogado.getId());
     }
 
     private Set<Medicamento> parseCsv(MultipartFile file) throws IOException {

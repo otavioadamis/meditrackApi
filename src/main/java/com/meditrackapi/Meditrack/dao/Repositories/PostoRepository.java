@@ -23,6 +23,4 @@ public interface PostoRepository extends JpaRepository<Posto, String> {
             nativeQuery = true
     )
     List<ListaPostosResponse> findPostosByMedicamentoId(@Param("id") String id);
-    @Query(value = "SELECT ")
-    String findPostoIdByFuncionarioId(@Param("funcionarioId") String funcionarioId);
 }

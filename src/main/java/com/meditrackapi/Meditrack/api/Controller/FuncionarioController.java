@@ -1,14 +1,13 @@
 package com.meditrackapi.Meditrack.api.Controller;
 
+import com.meditrackapi.Meditrack.domain.DTOs.MedicamentoTOs.Response.MedicamentoCard;
 import com.meditrackapi.Meditrack.domain.Interfaces.IMedicamentoService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestPart;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/funcionario")
@@ -20,6 +19,11 @@ public class FuncionarioController {
 
     @PostMapping(value = "/atualizar-estoque", consumes = {"multipart/form-data"})
     public ResponseEntity<Integer> atualizarEstoque(@RequestPart("file") MultipartFile file) throws IOException {
-        return ResponseEntity.ok(_medicamentoService.AtualizarEstoque(file, "teste"));
+        return ResponseEntity.ok(_medicamentoService.AtualizarEstoque(file));
+    }
+
+    @GetMapping("/listar-meds")
+    public ResponseEntity<List<MedicamentoCard>> listarMedicamentosDoPosto(){
+        return ResponseEntity.ok(_medicamentoService.listarMedicamentosPorPosto());
     }
 }

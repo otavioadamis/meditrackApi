@@ -1,6 +1,7 @@
 package com.meditrackapi.Meditrack.dao.Repositories;
 
 import com.meditrackapi.Meditrack.domain.DTOs.MedicamentoTOs.Response.ListaMedsResponse;
+import com.meditrackapi.Meditrack.domain.DTOs.MedicamentoTOs.Response.MedicamentoCard;
 import com.meditrackapi.Meditrack.domain.DTOs.MedicamentoTOs.Response.MedicamentoResponse;
 import com.meditrackapi.Meditrack.domain.Entities.Medicamento;
 import com.meditrackapi.Meditrack.domain.Entities.Usuario;
@@ -25,4 +26,18 @@ public interface MedicamentoRepository extends JpaRepository<Medicamento, String
                     "WHERE UPPER(produto) " +
                     "LIKE CONCAT('%', UPPER(:nome), '%')")
     List<ListaMedsResponse> findByName(@Param("nome") String nome);
+    @Query(
+            value = "SELECT med.id as medicamentoId, " +
+                    "med.codigo as codigoMedicamento, " +
+                    "med.lote as loteMedicamento, " +
+                    "med.produto as nomeMedicamento, " +
+                    "med.tipo as tipoMedicamento, " +
+                    "med.necessita_receita as necessitaReceita, " +
+                    "med.vencimento as dataVencimento " +
+                    "FROM medicamento med " +
+                    "JOIN medicamento_posto medposto ON medposto.medicamento_id = med.id " +
+                    "WHERE medposto.posto_id = :postoId",
+            nativeQuery = true
+    )
+    List<MedicamentoCard> findAllByPostoId(@Param("postoId") String postoId);
 }

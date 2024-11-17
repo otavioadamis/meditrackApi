@@ -30,7 +30,6 @@ public class MedicamentoPosto {
     @Column(name = "quantidade_estoque", nullable = false)
     private int quantidadeEstoque;
 
-    // Constructor for easy creation
     public MedicamentoPosto(Medicamento medicamento, Posto posto, int quantidadeEstoque) {
         this.medicamento = medicamento;
         this.posto = posto;
