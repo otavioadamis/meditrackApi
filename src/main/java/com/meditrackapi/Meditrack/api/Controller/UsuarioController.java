@@ -1,9 +1,6 @@
 package com.meditrackapi.Meditrack.api.Controller;
 
-import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.LoginResponseDTO;
-import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.PostUsuarioDTO;
-import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.UserLoginDTO;
-import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.UsuarioResponseDTO;
+import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.*;
 import com.meditrackapi.Meditrack.domain.Entities.Usuario;
 import com.meditrackapi.Meditrack.domain.Interfaces.IUsuarioService;
 import jakarta.validation.Valid;
@@ -25,6 +22,12 @@ public class UsuarioController {
     @PostMapping("/cadastro")
     public ResponseEntity<LoginResponseDTO> cadastrarUsuario(@RequestBody @Valid PostUsuarioDTO novoUsuario){
         LoginResponseDTO response = _usuarioService.cadastrarUsuario(novoUsuario);
+        return ResponseEntity.ok(response);
+    }
+
+    @PutMapping("/editar")
+    public ResponseEntity<UsuarioResponseDTO> editarUsuario(@RequestBody @Valid EditUsuarioDTO usuarioInfos){
+        UsuarioResponseDTO response = _usuarioService.editarUsuario(usuarioInfos);
         return ResponseEntity.ok(response);
     }
 

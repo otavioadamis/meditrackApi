@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.Set;
+
 @Table(name = "posto")
 @Entity
 @Setter
@@ -22,4 +24,9 @@ public class Posto {
     private String numero;
     private String linhasOnibus;
     private String telefone;
+    @ManyToMany
+    @JoinTable(name = "medicamento_posto",
+            joinColumns = @JoinColumn(name = "medicamento_id"),
+            inverseJoinColumns = @JoinColumn(name = "posto_id"))
+    private Set<Posto> postos;
 }

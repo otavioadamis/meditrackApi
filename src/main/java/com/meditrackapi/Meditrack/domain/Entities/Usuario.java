@@ -1,6 +1,7 @@
 package com.meditrackapi.Meditrack.domain.Entities;
 
 import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.PostUsuarioDTO;
+import com.meditrackapi.Meditrack.domain.Enums.Role;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -31,6 +32,11 @@ public class Usuario implements UserDetails {
     private Date dataNascimento;
     @CreationTimestamp
     private Date criadoEm;
+    @Enumerated(EnumType.STRING)
+    private Role tipo = Role.ROLE_USUARIO;
+    @OneToOne
+    @JoinColumn(name = "posto_id")
+    private Posto posto;
 
     public Usuario(PostUsuarioDTO novoUsuario, String encryptedPassword){
         this.nomeCompleto = novoUsuario.nomeCompleto();
@@ -43,7 +49,7 @@ public class Usuario implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        return List.of(new SimpleGrantedAuthority(tipo.name()));
     }
 
     @Override
