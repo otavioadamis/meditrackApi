@@ -6,6 +6,7 @@ public record UsuarioResponseDTO(
         String nomeCompleto,
         String email,
         String cpf,
-        String fotoPerfil
+        String fotoPerfil,
+        String tipo
 ) {
 }

@@ -9,5 +9,6 @@ public interface IUsuarioService {
     LoginResponseDTO cadastrarUsuario(PostUsuarioDTO novoUsuario);
     public UsuarioResponseDTO editarUsuario(EditUsuarioDTO usuarioInfos);
     LoginResponseDTO login(UserLoginDTO userLogin);
+    UsuarioResponseDTO getUsuarioByAuthToken();
     List<Usuario> listarTodosUsuarios(); // Adicione esta linha
 }

@@ -31,6 +31,12 @@ public class UsuarioController {
         return ResponseEntity.ok(response);
     }
 
+    @GetMapping("")
+    public ResponseEntity<UsuarioResponseDTO> getUsuarioByAuthToken(){
+        UsuarioResponseDTO response = _usuarioService.getUsuarioByAuthToken();
+        return ResponseEntity.ok(response);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<LoginResponseDTO> login(@RequestBody @Valid UserLoginDTO userLogin){
         LoginResponseDTO response = _usuarioService.login(userLogin);

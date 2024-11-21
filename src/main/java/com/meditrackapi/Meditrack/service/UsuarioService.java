@@ -8,6 +8,7 @@ import com.meditrackapi.Meditrack.domain.Interfaces.IUsuarioService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -53,12 +54,28 @@ public class UsuarioService implements IUsuarioService {
                 usuario.getNomeCompleto(),
                 usuario.getEmail(),
                 usuario.getCpf(),
-                usuario.getFotoPerfil()
+                usuario.getFotoPerfil(),
+                usuario.getTipo().toString()
         );
 
         return new LoginResponseDTO(
                 jwtToken,
                 usuarioResponse
+        );
+    }
+
+    public UsuarioResponseDTO getUsuarioByAuthToken(){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+        Usuario usuario = (Usuario) _usuarioRepo.findByEmail(loggedInUserEmail);
+
+        return new UsuarioResponseDTO(
+                usuario.getId(),
+                usuario.getNomeCompleto(),
+                usuario.getEmail(),
+                usuario.getCpf(),
+                usuario.getFotoPerfil(),
+                usuario.getTipo().toString()
         );
     }
 
@@ -77,7 +94,8 @@ public class UsuarioService implements IUsuarioService {
                 usuario.getNomeCompleto(),
                 usuario.getEmail(),
                 usuario.getCpf(),
-                usuario.getFotoPerfil()
+                usuario.getFotoPerfil(),
+                usuario.getTipo().toString()
         );
     }
 
@@ -98,7 +116,8 @@ public class UsuarioService implements IUsuarioService {
                 usuario.getNomeCompleto(),
                 usuario.getEmail(),
                 usuario.getCpf(),
-                usuario.getFotoPerfil()
+                usuario.getFotoPerfil(),
+                usuario.getTipo().toString()
         );
 
         return new LoginResponseDTO(
