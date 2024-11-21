@@ -1,12 +1,12 @@
 package com.meditrackapi.Meditrack.dao.Repositories;
 
-import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.ListaPostosResponse;
+import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.*;
 import com.meditrackapi.Meditrack.domain.Entities.Posto;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-
 import java.util.List;
+import java.util.Optional;
 
 public interface PostoRepository extends JpaRepository<Posto, String> {
     @Query(
@@ -23,4 +23,20 @@ public interface PostoRepository extends JpaRepository<Posto, String> {
             nativeQuery = true
     )
     List<ListaPostosResponse> findPostosByMedicamentoId(@Param("id") String id);
+
+    @Query(
+        value = "SELECT new com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoComMedicamentosResponse(" +
+                "p.id, p.nome) " +
+                "FROM Posto p " +
+                "WHERE p.id = :id"
+    )
+    Optional<PostoComMedicamentosResponse> findComMedicamentosById(@Param("id") String id);
+
+    @Query(
+        value = "SELECT new com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoResumoResponse(" +
+                "p.id, p.nome, p.bairro, p.rua, p.numero, p.linhasOnibus, p.telefone) " +
+                "FROM Posto p " +
+                "WHERE UPPER(p.nome) LIKE UPPER(CONCAT('%', :nome, '%'))"
+    )
+    List<PostoResumoResponse> findByNomeContainingIgnoreCase(@Param("nome") String nome);
 }
