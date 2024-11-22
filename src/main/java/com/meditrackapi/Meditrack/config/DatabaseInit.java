@@ -24,11 +24,11 @@ public class DatabaseInit {
             );
             jdbcTemplate.execute(
                     "COPY posto(id, nome, bairro, rua, numero, linhas_onibus, telefone) " +
-                            "FROM '/data/postos_v1.csv' DELIMITER ',' CSV HEADER;"
+                            "FROM '/data/postos_v2.csv' DELIMITER ',' CSV HEADER;"
             );
             jdbcTemplate.execute(
                     "COPY medicamento_posto(medicamento_id, posto_id, quantidade_estoque) " +
-                            "FROM '/data/medicamento_posto_v1.csv' DELIMITER ',' CSV HEADER;"
+                            "FROM '/data/medicamento_posto_v2.csv' DELIMITER ',' CSV HEADER;"
             );
             jdbcTemplate.execute(
                     "COPY usuario(id, nome_completo, cpf, email, senha, foto_perfil, data_nascimento, criado_em, tipo, posto_id) " +
