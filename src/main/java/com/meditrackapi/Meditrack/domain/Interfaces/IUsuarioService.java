@@ -10,5 +10,6 @@ public interface IUsuarioService {
     public UsuarioResponseDTO editarUsuario(EditUsuarioDTO usuarioInfos);
     LoginResponseDTO login(UserLoginDTO userLogin);
     UsuarioResponseDTO getUsuarioByAuthToken();
-    List<Usuario> listarTodosUsuarios(); // Adicione esta linha
+    List<Usuario> listarTodosUsuarios();
+    void ChangePassword(String newPassword);
 }

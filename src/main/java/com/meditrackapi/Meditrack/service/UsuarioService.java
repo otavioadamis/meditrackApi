@@ -4,6 +4,7 @@ import com.meditrackapi.Meditrack.dao.Repositories.UsuarioRepository;
 import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.*;
 import com.meditrackapi.Meditrack.domain.Entities.Usuario;
 import com.meditrackapi.Meditrack.domain.Interfaces.IAuthenticationService;
+import com.meditrackapi.Meditrack.domain.Interfaces.IEmailService;
 import com.meditrackapi.Meditrack.domain.Interfaces.IUsuarioService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -21,17 +22,20 @@ public class UsuarioService implements IUsuarioService {
     private final IAuthenticationService _authService;
     private final AuthenticationManager _authenticationManager;
     private final PasswordEncoder _passwordEncoder;
+    private final IEmailService _emailService;
 
     public UsuarioService(
             UsuarioRepository usuarioRepo,
             AuthenticationManager authenticationManager,
             IAuthenticationService authService,
-            PasswordEncoder passwordEncoder)
+            PasswordEncoder passwordEncoder,
+            IEmailService emailService)
     {
         _usuarioRepo = usuarioRepo;
         _authenticationManager = authenticationManager;
         _authService = authService;
         _passwordEncoder = passwordEncoder;
+        _emailService = emailService;
     }
 
     @Override
@@ -64,6 +68,18 @@ public class UsuarioService implements IUsuarioService {
         );
     }
 
+    @Override
+    public void ChangePassword(String newPassword){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String loggedInUserEmail = authentication.getName();
+        Usuario usuarioLogado = (Usuario) _usuarioRepo.findByEmail(loggedInUserEmail);
+
+        String encryptedNewPassword = _passwordEncoder.encode(newPassword);
+        usuarioLogado.setSenha(encryptedNewPassword);
+        _usuarioRepo.save(usuarioLogado);
+    }
+
+    @Override
     public UsuarioResponseDTO getUsuarioByAuthToken(){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String loggedInUserEmail = authentication.getName();
@@ -79,6 +95,7 @@ public class UsuarioService implements IUsuarioService {
         );
     }
 
+    @Override
     public UsuarioResponseDTO editarUsuario(EditUsuarioDTO usuarioInfos){
         Usuario usuario = _usuarioRepo.findById(usuarioInfos.usuarioId())
                 .orElseThrow(()-> new IllegalArgumentException("Não foi possível encontrar o usuário."));

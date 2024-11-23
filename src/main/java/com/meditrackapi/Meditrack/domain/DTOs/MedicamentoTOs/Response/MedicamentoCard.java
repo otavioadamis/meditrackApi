@@ -10,4 +10,5 @@ public interface MedicamentoCard {
     String getTipoMedicamento();
     Boolean getNecessitaReceita();
     Date getDataVencimento();
+    Integer getQuantidadeEstoque();
 }
