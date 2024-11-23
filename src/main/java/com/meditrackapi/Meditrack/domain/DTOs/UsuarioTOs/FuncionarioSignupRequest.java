@@ -2,11 +2,10 @@ package com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs;
 
 import java.util.Date;
 
-public record PostUsuarioDTO(
+public record FuncionarioSignupRequest (
         String nomeCompleto,
         String cpf,
         String email,
-        String senha,
-        Date dataNascimento
-) {
-}
+        Date dataNascimento,
+        String postoId
+){}

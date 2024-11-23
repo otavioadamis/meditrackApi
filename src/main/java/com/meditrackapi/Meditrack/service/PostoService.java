@@ -4,6 +4,7 @@ import com.meditrackapi.Meditrack.dao.Repositories.MedicamentoRepository;
 import com.meditrackapi.Meditrack.dao.Repositories.PostoRepository;
 import com.meditrackapi.Meditrack.domain.DTOs.MedicamentoTOs.Response.MedicamentoCard;
 import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoComMedicamentosResponse;
+import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoDetalhadoResponse;
 import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoResumoResponse;
 import com.meditrackapi.Meditrack.domain.Interfaces.IPostoService;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,11 @@ public class PostoService implements IPostoService {
                        MedicamentoRepository medicamentoRepository) {
         _postoRepo = postoRepository;
         _medicamentoRepo = medicamentoRepository;
+    }
+
+    @Override
+    public List<PostoDetalhadoResponse> findAllPostos(){
+        return _postoRepo.findAllPostos();
     }
 
     @Override

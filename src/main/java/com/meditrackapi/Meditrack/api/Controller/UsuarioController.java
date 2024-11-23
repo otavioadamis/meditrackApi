@@ -31,6 +31,12 @@ public class UsuarioController {
         return ResponseEntity.ok(response);
     }
 
+    @PutMapping("/trocar-senha")
+    public ResponseEntity<String> trocarSenha(@RequestBody String newPassword){
+        _usuarioService.ChangePassword(newPassword);
+        return ResponseEntity.ok("Senha alterada.");
+    }
+
     @GetMapping("")
     public ResponseEntity<UsuarioResponseDTO> getUsuarioByAuthToken(){
         UsuarioResponseDTO response = _usuarioService.getUsuarioByAuthToken();

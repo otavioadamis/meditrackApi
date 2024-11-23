@@ -80,6 +80,7 @@ public class MedicamentoService implements IMedicamentoService {
         String loggedInUserEmail = authentication.getName();
         Usuario usuarioLogado = (Usuario) _userRepo.findByEmail(loggedInUserEmail);
         String postoId = usuarioLogado.getPosto().getId();
+
         Set<UpdateEstoqueCsvReprensentation> medicamentos = parseEstoqueCsv(file);
 
         int updatesCount = 0;

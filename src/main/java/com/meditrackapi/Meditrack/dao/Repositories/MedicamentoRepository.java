@@ -33,7 +33,8 @@ public interface MedicamentoRepository extends JpaRepository<Medicamento, String
                     "med.produto as nomeMedicamento, " +
                     "med.tipo as tipoMedicamento, " +
                     "med.necessita_receita as necessitaReceita, " +
-                    "med.vencimento as dataVencimento " +
+                    "med.vencimento as dataVencimento, " +
+                    "medposto.quantidade_estoque as quantidadeEstoque " +
                     "FROM medicamento med " +
                     "JOIN medicamento_posto medposto ON medposto.medicamento_id = med.id " +
                     "WHERE medposto.posto_id = :postoId",

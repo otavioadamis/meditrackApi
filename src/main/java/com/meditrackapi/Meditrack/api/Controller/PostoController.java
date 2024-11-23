@@ -1,6 +1,7 @@
 package com.meditrackapi.Meditrack.api.Controller;
 
 import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoComMedicamentosResponse;
+import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoDetalhadoResponse;
 import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoResumoResponse;
 import com.meditrackapi.Meditrack.domain.Interfaces.IPostoService;
 import org.springframework.http.ResponseEntity;
@@ -27,5 +28,10 @@ public class PostoController {
     @GetMapping("/pesquisar/{nome}")
     public ResponseEntity<List<PostoResumoResponse>> buscarPorNome(@PathVariable String nome) {
         return ResponseEntity.ok(_postoService.SearchByName(nome));
+    }
+
+    @GetMapping("/listar-postos")
+    public ResponseEntity<List<PostoDetalhadoResponse>> findAllPostos(){
+        return ResponseEntity.ok(_postoService.findAllPostos());
     }
 }
