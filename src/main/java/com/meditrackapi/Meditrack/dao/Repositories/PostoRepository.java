@@ -9,6 +9,20 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostoRepository extends JpaRepository<Posto, String> {
+
+    @Query(
+            value = "SELECT p.id as idPosto, " +
+                    "p.nome as nomePosto, " +
+                    "p.bairro as bairroPosto, " +
+                    "p.rua as ruaPosto, " +
+                    "p.numero as numeroPosto, " +
+                    "p.linhas_onibus as linhasOnibusPosto, " +
+                    "p.telefone as telefonePosto " +
+                    "FROM posto p",
+            nativeQuery = true
+    )
+    List<PostoDetalhadoResponse> findAllPostos();
+
     @Query(
             value = "SELECT p.nome AS nomePosto, " +
                     "p.bairro AS bairroPosto, " +
