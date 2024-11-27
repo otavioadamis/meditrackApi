@@ -55,6 +55,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.POST, "/api/funcionario/atualizar-estoque").hasRole("FUNCIONARIO")
                         .requestMatchers(HttpMethod.GET, "/api/funcionario/listar-meds").hasRole("FUNCIONARIO")
                         .requestMatchers(HttpMethod.GET, "/api/posto/listar-postos").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/posto/historico-estoque").hasRole("FUNCIONARIO")
                         .requestMatchers("/v3/api-docs/**", "swagger-ui/**", "swagger-ui.html", "swagger/index.html").permitAll()
                         .anyRequest().authenticated()
                 )
