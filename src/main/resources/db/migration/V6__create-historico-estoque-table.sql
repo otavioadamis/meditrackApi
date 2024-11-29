@@ -10,4 +10,4 @@ CREATE TABLE historico_estoque (
 ALTER TABLE USUARIO ADD COLUMN is_verificado BOOLEAN DEFAULT FALSE;
 ALTER TABLE USUARIO ADD COLUMN codigo_verificacao VARCHAR(255);
 
-UPDATE usuario SET is_verificado = TRUE WHERE is_verificado IS NULL;
+UPDATE usuario SET is_verificado = TRUE WHERE is_verificado IS FALSE;
