@@ -37,6 +37,8 @@ public class Usuario implements UserDetails {
     @OneToOne
     @JoinColumn(name = "posto_id")
     private Posto posto;
+    private Boolean isVerificado = false;
+    private String codigoVerificacao;
 
     public Usuario(PostUsuarioDTO novoUsuario, String encryptedPassword){
         this.nomeCompleto = novoUsuario.nomeCompleto();

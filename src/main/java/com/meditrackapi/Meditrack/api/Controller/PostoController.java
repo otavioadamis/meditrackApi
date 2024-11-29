@@ -1,5 +1,6 @@
 package com.meditrackapi.Meditrack.api.Controller;
 
+import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.HistoricoEstoqueResponse;
 import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoComMedicamentosResponse;
 import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoDetalhadoResponse;
 import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoResumoResponse;
@@ -33,5 +34,10 @@ public class PostoController {
     @GetMapping("/listar-postos")
     public ResponseEntity<List<PostoDetalhadoResponse>> findAllPostos(){
         return ResponseEntity.ok(_postoService.findAllPostos());
+    }
+
+    @GetMapping("/historico-estoque")
+    public ResponseEntity<List<HistoricoEstoqueResponse>> getHistoricoEstoqueByPostoId(){
+        return ResponseEntity.ok(_postoService.getHistoricoEstoque());
     }
 }

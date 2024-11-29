@@ -3,7 +3,9 @@ package com.meditrackapi.Meditrack.service;
 import com.meditrackapi.Meditrack.dao.Repositories.*;
 import com.meditrackapi.Meditrack.domain.DTOs.MedicamentoTOs.Response.*;
 import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.ListaPostosResponse;
+import com.meditrackapi.Meditrack.domain.Entities.HistoricoEstoque;
 import com.meditrackapi.Meditrack.domain.Entities.Medicamento;
+import com.meditrackapi.Meditrack.domain.Entities.Posto;
 import com.meditrackapi.Meditrack.domain.Entities.Usuario;
 import com.meditrackapi.Meditrack.domain.Entities.auxiliar.UsuarioMedicamento;
 import com.meditrackapi.Meditrack.domain.Interfaces.IMedicamentoService;
@@ -33,17 +35,20 @@ public class MedicamentoService implements IMedicamentoService {
     private final MedicamentoRepository _medicamentoRepo;
     private final PostoRepository _postoRepo;
     private final UsuarioRepository _userRepo;
+    private final HistoricoEstoqueRepository _historicoEstoqueRepo;
     public MedicamentoService(MedicamentoRepository medicamentoRepository,
                               PostoRepository postoRepository,
                               MedicamentoPostoRepository medicamentoPostoRepository,
                               UsuarioRepository usuarioRepository,
-                              UsuarioMedicamentoRepository usuarioMedicamentoRepository
+                              UsuarioMedicamentoRepository usuarioMedicamentoRepository,
+                              HistoricoEstoqueRepository historicoEstoqueRepository
                               ){
         _medicamentoRepo = medicamentoRepository;
         _postoRepo = postoRepository;
         _medPostoRepo = medicamentoPostoRepository;
         _userRepo = usuarioRepository;
         _userMedRepo = usuarioMedicamentoRepository;
+        _historicoEstoqueRepo = historicoEstoqueRepository;
     }
 
     @Override
@@ -79,16 +84,17 @@ public class MedicamentoService implements IMedicamentoService {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         String loggedInUserEmail = authentication.getName();
         Usuario usuarioLogado = (Usuario) _userRepo.findByEmail(loggedInUserEmail);
-        String postoId = usuarioLogado.getPosto().getId();
+
+        Posto posto = usuarioLogado.getPosto();
+        atualizarHistorico(posto, usuarioLogado);
 
         Set<UpdateEstoqueCsvReprensentation> medicamentos = parseEstoqueCsv(file);
-
         int updatesCount = 0;
         for (UpdateEstoqueCsvReprensentation csvLine : medicamentos) {
             Optional<Medicamento> medicamentoOpt = _medicamentoRepo.findByCodigo(csvLine.get_codigo());
             if (medicamentoOpt.isPresent()) {
                 Medicamento medicamento = medicamentoOpt.get();
-                updatesCount += _medPostoRepo.updateQuantidadeEstoque(postoId, medicamento.getId(), csvLine.get_quantidade());
+                updatesCount += _medPostoRepo.updateQuantidadeEstoque(posto.getId(), medicamento.getId(), csvLine.get_quantidade());
             }
         }
         return updatesCount;
@@ -117,6 +123,11 @@ public class MedicamentoService implements IMedicamentoService {
         String loggedInUserEmail = authentication.getName();
         Usuario usuarioLogado = (Usuario) _userRepo.findByEmail(loggedInUserEmail);
         return _userMedRepo.findMedicamentosByUsuarioId(usuarioLogado.getId());
+    }
+
+    private void atualizarHistorico(Posto posto, Usuario funcionario){
+        HistoricoEstoque novoRegistro = new HistoricoEstoque(posto, funcionario);
+        _historicoEstoqueRepo.save(novoRegistro);
     }
 
     private Set<Medicamento> parseCsv(MultipartFile file) throws IOException {
