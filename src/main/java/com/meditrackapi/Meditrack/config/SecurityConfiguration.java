@@ -46,6 +46,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/usuario/listar").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/usuario/editar").authenticated()
                         .requestMatchers(HttpMethod.PUT, "/api/usuario/trocar-senha").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/usuario/confirmar-email/{userId}/{authCode}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/medicamento/pesquisar/{nome}").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/medicamento/{id}").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/medicamento/favoritar/{medicamentoId}").hasRole("USUARIO")

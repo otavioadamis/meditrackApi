@@ -4,6 +4,8 @@ import com.meditrackapi.Meditrack.domain.DTOs.UsuarioTOs.*;
 import com.meditrackapi.Meditrack.domain.Entities.Usuario;
 import com.meditrackapi.Meditrack.domain.Interfaces.IUsuarioService;
 import jakarta.validation.Valid;
+import org.apache.coyote.Response;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,9 +22,19 @@ public class UsuarioController {
     }
 
     @PostMapping("/cadastro")
-    public ResponseEntity<LoginResponseDTO> cadastrarUsuario(@RequestBody @Valid PostUsuarioDTO novoUsuario){
-        LoginResponseDTO response = _usuarioService.cadastrarUsuario(novoUsuario);
+    public ResponseEntity<UsuarioResponseDTO> cadastrarUsuario(@RequestBody @Valid PostUsuarioDTO novoUsuario){
+        UsuarioResponseDTO response = _usuarioService.cadastrarUsuario(novoUsuario);
         return ResponseEntity.ok(response);
+    }
+
+    @GetMapping("/confirmar-email/{userId}/{authCode}")
+    public ResponseEntity<String> confirmarEmail(@PathVariable String userId, @PathVariable String authCode){
+        boolean validado = _usuarioService.confirmarEmail(userId, authCode);
+        if (validado) {
+            return ResponseEntity.ok("Email confirmado com sucesso.");
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Código de autenticação inválido.");
+        }
     }
 
     @PutMapping("/editar")

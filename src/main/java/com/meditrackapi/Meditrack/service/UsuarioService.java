@@ -14,6 +14,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class UsuarioService implements IUsuarioService {
@@ -39,7 +40,7 @@ public class UsuarioService implements IUsuarioService {
     }
 
     @Override
-    public LoginResponseDTO cadastrarUsuario(PostUsuarioDTO novoUsuario)
+    public UsuarioResponseDTO cadastrarUsuario(PostUsuarioDTO novoUsuario)
     {
         Usuario checkEmailAndCpf = _usuarioRepo.findByEmailOrCpf(novoUsuario.email(), novoUsuario.cpf());
         if(checkEmailAndCpf != null){
@@ -49,11 +50,18 @@ public class UsuarioService implements IUsuarioService {
         String encryptedPassword = _passwordEncoder.encode(novoUsuario.senha());
         Usuario usuario = new Usuario(novoUsuario, encryptedPassword);
 
+        String codigoVerificacao = java.util.UUID.randomUUID().toString();
+        usuario.setCodigoVerificacao(codigoVerificacao);
         _usuarioRepo.save(usuario);
 
-        String jwtToken = _authService.createToken(usuario);
+        String URL = "http://localhost:5173/confirmar-email";
+        String link = URL + "/" + usuario.getId() + "/" + codigoVerificacao;
+        String body = "<p>Bem-vindo ao Meditrack! Você pode verificar seu email clicando "
+                + "<a href=\"" + link + "\">aqui</a>.</p>";
 
-        UsuarioResponseDTO usuarioResponse = new UsuarioResponseDTO(
+        _emailService.SendMail(usuario.getEmail(), "Confirmação de email", body);
+
+        return new UsuarioResponseDTO(
                 usuario.getId(),
                 usuario.getNomeCompleto(),
                 usuario.getEmail(),
@@ -61,11 +69,18 @@ public class UsuarioService implements IUsuarioService {
                 usuario.getFotoPerfil(),
                 usuario.getTipo().toString()
         );
+    }
 
-        return new LoginResponseDTO(
-                jwtToken,
-                usuarioResponse
-        );
+    @Override
+    public boolean confirmarEmail(String userId, String authCode){
+        Usuario usuario = _usuarioRepo.findById(userId)
+                .orElseThrow(()-> new IllegalArgumentException("Usuario nao encontrado."));
+        if(Objects.equals(usuario.getCodigoVerificacao(), authCode)){
+            usuario.setIsVerificado(true);
+            _usuarioRepo.save(usuario);
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -119,12 +134,16 @@ public class UsuarioService implements IUsuarioService {
     @Override
     public LoginResponseDTO login(UserLoginDTO userLogin)
     {
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    userLogin.email(),
-                    userLogin.senha()
-            );
-            Authentication auth = _authenticationManager.authenticate(authenticationToken);
-            Usuario usuario = (Usuario) auth.getPrincipal();
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                userLogin.email(),
+                userLogin.senha()
+        );
+        Authentication auth = _authenticationManager.authenticate(authenticationToken);
+        Usuario usuario = (Usuario) auth.getPrincipal();
+
+        if(!usuario.getIsVerificado()){
+            throw new IllegalArgumentException("Email ainda não validado.");
+        }
 
         String jwtToken = _authService.createToken(usuario);
 
@@ -135,12 +154,12 @@ public class UsuarioService implements IUsuarioService {
                 usuario.getCpf(),
                 usuario.getFotoPerfil(),
                 usuario.getTipo().toString()
-        );
+            );
 
         return new LoginResponseDTO(
                 jwtToken,
                 usuarioResponse
-        );
+            );
     }
 
     @Override
