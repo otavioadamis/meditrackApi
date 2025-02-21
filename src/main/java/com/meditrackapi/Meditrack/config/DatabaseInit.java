@@ -31,11 +31,11 @@ public class DatabaseInit {
                             "FROM '/data/medicamento_posto_v3.csv' DELIMITER ',' CSV HEADER;"
             );
             jdbcTemplate.execute(
-                    "COPY usuario(id, nome_completo, cpf, email, senha, foto_perfil, data_nascimento, criado_em, tipo, posto_id) " +
+                    "COPY usuario(id, nome_completo, cpf, email, senha, foto_perfil, data_nascimento, criado_em, tipo, posto_id, is_verificado) " +
                             "FROM '/data/funcionarios_v1.csv' DELIMITER ',' CSV HEADER;"
             );
             jdbcTemplate.execute(
-                    "COPY usuario(id, nome_completo, cpf, email, senha, foto_perfil, data_nascimento, criado_em, tipo) " +
+                    "COPY usuario(id, nome_completo, cpf, email, senha, foto_perfil, data_nascimento, criado_em, tipo, is_verificado) " +
                             "FROM '/data/usuarios_v1.csv' DELIMITER ',' CSV HEADER;"
             );
         }

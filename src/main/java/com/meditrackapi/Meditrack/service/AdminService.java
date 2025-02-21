@@ -72,6 +72,7 @@ public class AdminService implements IAdminService {
         Usuario usuario = new Usuario(usuarioDTO, encryptedPassword);
         usuario.setPosto(posto);
         usuario.setTipo(Role.ROLE_FUNCIONARIO);
+        usuario.setIsVerificado(true);
         _usuarioRepo.save(usuario);
 
         return new UsuarioResponseDTO(
