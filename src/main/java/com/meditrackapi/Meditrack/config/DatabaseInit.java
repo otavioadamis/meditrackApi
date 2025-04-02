@@ -20,11 +20,11 @@ public class DatabaseInit {
         if (count != null && count == 0) {
             jdbcTemplate.execute(
                     "COPY medicamento(id, codigo, lote, produto, tipo, vencimento, necessita_receita) " +
-                    "FROM '/data/medicamentos_v3.csv' DELIMITER ',' CSV HEADER;"
+                            "FROM '/data/medicamentos_v3.csv' DELIMITER ',' CSV HEADER;"
             );
             jdbcTemplate.execute(
-                    "COPY posto(id, nome, bairro, rua, numero, linhas_onibus, telefone) " +
-                            "FROM '/data/postos_v2.csv' DELIMITER ',' CSV HEADER;"
+                    "COPY posto(id, nome, bairro, rua, numero, linhas_onibus, telefone, latitude, longitude) " +
+                            "FROM '/data/postos_v3_02.csv' DELIMITER ',' CSV HEADER;"
             );
             jdbcTemplate.execute(
                     "COPY medicamento_posto(medicamento_id, posto_id, quantidade_estoque) " +

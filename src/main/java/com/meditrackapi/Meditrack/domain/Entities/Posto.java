@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.Set;
 
 @Table(name = "posto")
@@ -24,6 +25,10 @@ public class Posto {
     private String numero;
     private String linhasOnibus;
     private String telefone;
+    @Column(precision = 9, scale = 6, nullable = false)
+    private BigDecimal latitude;
+    @Column(precision = 9, scale = 6, nullable = false)
+    private BigDecimal longitude;
     @ManyToMany
     @JoinTable(name = "medicamento_posto",
             joinColumns = @JoinColumn(name = "medicamento_id"),
