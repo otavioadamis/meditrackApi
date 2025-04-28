@@ -57,6 +57,7 @@ public class SecurityConfiguration {
                         .requestMatchers(HttpMethod.GET, "/api/funcionario/listar-meds").hasRole("FUNCIONARIO")
                         .requestMatchers(HttpMethod.GET, "/api/posto/listar-postos").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/posto/historico-estoque").hasRole("FUNCIONARIO")
+                        .requestMatchers(HttpMethod.GET, "/api/posto/proximos").permitAll()
                         .requestMatchers("/v3/api-docs/**", "swagger-ui/**", "swagger-ui.html", "swagger/index.html").permitAll()
                         .anyRequest().authenticated()
                 )
@@ -67,7 +68,7 @@ public class SecurityConfiguration {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173"));
+        configuration.setAllowedOriginPatterns(List.of("*"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);

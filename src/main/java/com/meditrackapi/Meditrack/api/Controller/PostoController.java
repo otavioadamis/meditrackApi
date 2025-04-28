@@ -1,9 +1,6 @@
 package com.meditrackapi.Meditrack.api.Controller;
 
-import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.HistoricoEstoqueResponse;
-import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoComMedicamentosResponse;
-import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoDetalhadoResponse;
-import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoResumoResponse;
+import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.*;
 import com.meditrackapi.Meditrack.domain.Interfaces.IPostoService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -39,5 +36,10 @@ public class PostoController {
     @GetMapping("/historico-estoque")
     public ResponseEntity<List<HistoricoEstoqueResponse>> getHistoricoEstoqueByPostoId(){
         return ResponseEntity.ok(_postoService.getHistoricoEstoque());
+    }
+
+    @GetMapping("/proximos")
+    public ResponseEntity<List<PostoDistanciaResponse>> getPostosProximos(@RequestParam double lat, @RequestParam double lon){
+        return ResponseEntity.ok(_postoService.SearchPostosProximos(lat, lon));
     }
 }
