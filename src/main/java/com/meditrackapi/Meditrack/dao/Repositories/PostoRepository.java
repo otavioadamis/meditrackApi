@@ -53,4 +53,8 @@ public interface PostoRepository extends JpaRepository<Posto, String> {
                 "WHERE UPPER(p.nome) LIKE UPPER(CONCAT('%', :nome, '%'))"
     )
     List<PostoResumoResponse> findByNomeContainingIgnoreCase(@Param("nome") String nome);
+
+    /* Essa funcao é pra evitar muitas chamadas a API do maps, pra não passar do limite grátis. */
+    @Query(value = "SELECT * FROM posto LIMIT 2", nativeQuery = true)
+    List<Posto> findLimitedPostos();
 }
