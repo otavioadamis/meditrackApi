@@ -12,7 +12,7 @@ import java.util.Set;
 
 public interface IMedicamentoService {
     List<ListaMedsResponse> SearchByName(String nome);
-    MedicamentoResponse SearchById(String medicamentoId);
+    MedicamentoResponse SearchById(String medicamentoId, double userLat, double userLon);
     Integer InserirCargaMedicamentos(MultipartFile file) throws IOException;
     Integer AtualizarEstoque(MultipartFile file) throws IOException;
     List<MedicamentoCard> listarMedicamentosPorPosto();

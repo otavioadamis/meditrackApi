@@ -12,6 +12,8 @@ public class PostoDistanciaResponse {
     private String linhasOnibus;
     private String telefone;
     private double distanciaKm;
+    private double latitude;
+    private double longitude;
 
     public PostoDistanciaResponse(
             String id,
@@ -21,7 +23,9 @@ public class PostoDistanciaResponse {
             String numero,
             String linhasOnibus,
             String telefone,
-            double distanciaKm
+            double distanciaKm,
+            double latitude,
+            double longitude
     ) {
         this.id = id;
         this.nome = nome;
@@ -31,6 +35,8 @@ public class PostoDistanciaResponse {
         this.linhasOnibus = linhasOnibus;
         this.telefone = telefone;
         this.distanciaKm = distanciaKm;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
 }

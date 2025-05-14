@@ -75,11 +75,16 @@ public class PostoService implements IPostoService {
         return _postoRepo.findByNomeContainingIgnoreCase(nome);
     }
 
-    public List<PostoDistanciaResponse> SearchPostosProximos(double lat, double lon){
-        List<Posto> limitedPostos = _postoRepo.findLimitedPostos();
+    public List<PostoDistanciaResponse> SearchPostosProximos(double lat, double lon) {
+        List<Posto> postos = _postoRepo.findPostosWithCoordinates();
 
-        Map<String, Double> distanceMap = _distanceService.getDistances(lat, lon, limitedPostos);
-        return limitedPostos.stream()
+        List<PostoCoordenadasDTO> distanceInput = postos.stream()
+                .map(p -> new PostoCoordenadasDTO(p.getId(), p.getLatitude().doubleValue(), p.getLongitude().doubleValue()))
+                .toList();
+
+        Map<String, Double> distanceMap = _distanceService.getDistances(lat, lon, distanceInput);
+
+        return postos.stream()
                 .map(p -> new PostoDistanciaResponse(
                         p.getId(),
                         p.getNome(),
@@ -88,7 +93,9 @@ public class PostoService implements IPostoService {
                         p.getNumero(),
                         p.getLinhasOnibus(),
                         p.getTelefone(),
-                        distanceMap.getOrDefault(p.getId(), 0.0)
+                        distanceMap.getOrDefault(p.getId(), 0.0),
+                        p.getLatitude().doubleValue(),
+                        p.getLongitude().doubleValue()
                 ))
                 .sorted(Comparator.comparingDouble(PostoDistanciaResponse::getDistanciaKm))
                 .toList();

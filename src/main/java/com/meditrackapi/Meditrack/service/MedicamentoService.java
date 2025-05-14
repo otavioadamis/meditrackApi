@@ -2,12 +2,15 @@ package com.meditrackapi.Meditrack.service;
 
 import com.meditrackapi.Meditrack.dao.Repositories.*;
 import com.meditrackapi.Meditrack.domain.DTOs.MedicamentoTOs.Response.*;
+import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.ListaPostosComDistanciaDTO;
 import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.ListaPostosResponse;
+import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoCoordenadasDTO;
 import com.meditrackapi.Meditrack.domain.Entities.HistoricoEstoque;
 import com.meditrackapi.Meditrack.domain.Entities.Medicamento;
 import com.meditrackapi.Meditrack.domain.Entities.Posto;
 import com.meditrackapi.Meditrack.domain.Entities.Usuario;
 import com.meditrackapi.Meditrack.domain.Entities.auxiliar.UsuarioMedicamento;
+import com.meditrackapi.Meditrack.domain.Interfaces.IGoogleDistanceMatrixService;
 import com.meditrackapi.Meditrack.domain.Interfaces.IMedicamentoService;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
@@ -21,10 +24,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -36,12 +36,14 @@ public class MedicamentoService implements IMedicamentoService {
     private final PostoRepository _postoRepo;
     private final UsuarioRepository _userRepo;
     private final HistoricoEstoqueRepository _historicoEstoqueRepo;
+    private final IGoogleDistanceMatrixService _distanceService;
     public MedicamentoService(MedicamentoRepository medicamentoRepository,
                               PostoRepository postoRepository,
                               MedicamentoPostoRepository medicamentoPostoRepository,
                               UsuarioRepository usuarioRepository,
                               UsuarioMedicamentoRepository usuarioMedicamentoRepository,
-                              HistoricoEstoqueRepository historicoEstoqueRepository
+                              HistoricoEstoqueRepository historicoEstoqueRepository,
+                              IGoogleDistanceMatrixService distanceService
                               ){
         _medicamentoRepo = medicamentoRepository;
         _postoRepo = postoRepository;
@@ -49,6 +51,7 @@ public class MedicamentoService implements IMedicamentoService {
         _userRepo = usuarioRepository;
         _userMedRepo = usuarioMedicamentoRepository;
         _historicoEstoqueRepo = historicoEstoqueRepository;
+        _distanceService = distanceService;
     }
 
     @Override
@@ -57,11 +60,30 @@ public class MedicamentoService implements IMedicamentoService {
     }
 
     @Override
-    public MedicamentoResponse SearchById(String medicamentoId){
+    public MedicamentoResponse SearchById(String medicamentoId, double userLat, double userLon){
         Medicamento medicamento = _medicamentoRepo.findById(medicamentoId)
                 .orElseThrow(() -> new IllegalArgumentException("Medicamento não encontrado."));
 
         List<ListaPostosResponse> postos = _postoRepo.findPostosByMedicamentoId(medicamentoId);
+
+        List<PostoCoordenadasDTO> distanceInputs = postos.stream()
+                .map(p -> new PostoCoordenadasDTO(
+                        p.getPostoId(),
+                        p.getLatitude(),
+                        p.getLongitude()
+                ))
+                .toList();
+
+        Map<String, Double> distanceMap = _distanceService.getDistances(userLat, userLon, distanceInputs);
+
+        List<ListaPostosComDistanciaDTO> ordered = postos.stream()
+                .map(p -> new ListaPostosComDistanciaDTO(
+                        p,
+                        p.getPostoId(),
+                        distanceMap.getOrDefault(p.getPostoId(), Double.MAX_VALUE)
+                ))
+                .sorted(Comparator.comparingDouble(ListaPostosComDistanciaDTO::getDistanciaKm))
+                .toList();
 
         return new MedicamentoResponse(
                 medicamento.getCodigo(),
@@ -70,7 +92,7 @@ public class MedicamentoService implements IMedicamentoService {
                 medicamento.getTipo(),
                 medicamento.getVencimento(),
                 medicamento.isNecessitaReceita(),
-                postos
+                ordered
             );
     }
 

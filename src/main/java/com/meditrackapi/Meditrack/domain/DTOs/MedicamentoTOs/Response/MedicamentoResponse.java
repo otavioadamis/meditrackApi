@@ -1,5 +1,6 @@
 package com.meditrackapi.Meditrack.domain.DTOs.MedicamentoTOs.Response;
 
+import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.ListaPostosComDistanciaDTO;
 import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.ListaPostosResponse;
 
 import java.util.Date;
@@ -12,6 +13,6 @@ public record MedicamentoResponse(
         String tipoMedicamento,
         Date vencimento,
         boolean necessitaReceita,
-        List<ListaPostosResponse> postos
+        List<ListaPostosComDistanciaDTO> postos
 ) {
 }
