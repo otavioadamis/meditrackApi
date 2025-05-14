@@ -2,6 +2,8 @@ package com.meditrackapi.Meditrack.dao.Repositories;
 
 import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.*;
 import com.meditrackapi.Meditrack.domain.Entities.Posto;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -24,16 +26,21 @@ public interface PostoRepository extends JpaRepository<Posto, String> {
     List<PostoDetalhadoResponse> findAllPostos();
 
     @Query(
-            value = "SELECT p.nome AS nomePosto, " +
+            value = "SELECT p.id AS postoId, " +
+                    "p.nome AS nomePosto, " +
                     "p.bairro AS bairroPosto, " +
                     "p.rua AS ruaPosto, " +
                     "p.numero AS numeroPosto, " +
                     "p.linhas_onibus AS linhasOnibus, " +
                     "p.telefone AS telefone, " +
-                    "mp.quantidade_estoque as quantidadeEstoque " +
+                    "p.latitude AS latitude, " +
+                    "p.longitude AS longitude, " +
+                    "mp.quantidade_estoque AS quantidadeEstoque " +
                     "FROM posto p " +
                     "JOIN medicamento_posto mp ON p.id = mp.posto_id " +
-                    "WHERE mp.medicamento_id = :id",
+                    "WHERE mp.medicamento_id = :id " +
+                    "AND p.latitude IS NOT NULL " +
+                    "AND p.longitude IS NOT NULL",
             nativeQuery = true
     )
     List<ListaPostosResponse> findPostosByMedicamentoId(@Param("id") String id);
@@ -54,7 +61,6 @@ public interface PostoRepository extends JpaRepository<Posto, String> {
     )
     List<PostoResumoResponse> findByNomeContainingIgnoreCase(@Param("nome") String nome);
 
-    /* Essa funcao é pra evitar muitas chamadas a API do maps, pra não passar do limite grátis. */
-    @Query(value = "SELECT * FROM posto LIMIT 2", nativeQuery = true)
-    List<Posto> findLimitedPostos();
+    @Query(value = "SELECT * FROM posto WHERE latitude IS NOT NULL AND longitude IS NOT NULL", nativeQuery = true)
+    List<Posto> findPostosWithCoordinates();
 }

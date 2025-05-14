@@ -26,8 +26,8 @@ public class MedicamentoController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MedicamentoResponse> buscarMedicamentoPorId(@PathVariable String id){
-        MedicamentoResponse response = _medicamentoService.SearchById(id);
+    public ResponseEntity<MedicamentoResponse> buscarMedicamentoPorId(@PathVariable String id, @RequestParam double lat, @RequestParam double lon){
+        MedicamentoResponse response = _medicamentoService.SearchById(id, lat, lon);
         return ResponseEntity.ok(response);
     }
 

@@ -1,5 +1,6 @@
 package com.meditrackapi.Meditrack.service;
 
+import com.meditrackapi.Meditrack.domain.DTOs.PostoTOs.Response.PostoCoordenadasDTO;
 import com.meditrackapi.Meditrack.domain.Entities.Posto;
 import com.meditrackapi.Meditrack.domain.Interfaces.IGoogleDistanceMatrixService;
 import lombok.Data;
@@ -58,60 +59,55 @@ public class GoogleDistanceMatrixService implements IGoogleDistanceMatrixService
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    public Map<String, Double> getDistances(double userLat, double userLon, List<Posto> postos) {
-        String origins = userLat + "," + userLon;
-
-        for (Posto posto : postos) {
-            System.out.println("lat " + posto.getLatitude());
-            System.out.println("long " + posto.getLongitude());
-        }
-
-        String destinations = postos.stream()
-                .map(p -> p.getLatitude() + "," + p.getLongitude())
-                .collect(Collectors.joining("|"));
-
-        System.out.println("Número de destinos: " + postos.size());
-        System.out.println("Destinations string: " + destinations);
-        System.out.println("Origins string: " + origins);
-
-        String url = UriComponentsBuilder.fromHttpUrl("https://maps.googleapis.com/maps/api/distancematrix/json")
-                .queryParam("origins", origins)
-                .queryParam("destinations", destinations)
-                .queryParam("key", apiKey)
-                .queryParam("mode", "driving")
-                .build()
-                .toUriString();
-
-        System.out.println("URL de chamada: " + url);
-
-        ResponseEntity<DistanceMatrixResponse> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<>() {}
-        );
-        DistanceMatrixResponse matrix = response.getBody();
-
-        System.out.println("Matrix: " + matrix);
-        if (matrix == null || matrix.getRows() == null || matrix.getRows().isEmpty()) {
-            System.out.println("Resposta vazia ou com erro da API.");
-            return new HashMap<>();
-        }
-
-        List<DistanceMatrixElement> elements = matrix.getRows().get(0).getElements();
-        if (elements == null || elements.size() != postos.size()) {
-            System.out.println("Número de elementos da resposta não é compatível com o número de postos.");
-            return new HashMap<>();
-        }
-
+    public Map<String, Double> getDistances(double userLat, double userLon, List<PostoCoordenadasDTO> postos) {
+        final int BATCH_SIZE = 25;
+        String origin = userLat + "," + userLon;
         Map<String, Double> distanceMap = new HashMap<>();
 
-        for (int i = 0; i < postos.size(); i++) {
-            Posto posto = postos.get(i);
-            DistanceMatrixElement element = elements.get(i);
-            if (element.getStatus().equals("OK")) {
-                double distanceKm = element.getDistance().getValue() / 1000.0;
-                distanceMap.put(posto.getId(), distanceKm);
+        for (int i = 0; i < postos.size(); i += BATCH_SIZE) {
+            List<PostoCoordenadasDTO> batch = postos.subList(i, Math.min(i + BATCH_SIZE, postos.size()));
+
+            String destinations = batch.stream()
+                    .map(p -> p.getLatitude() + "," + p.getLongitude())
+                    .collect(Collectors.joining("|"));
+
+            String url = UriComponentsBuilder.fromHttpUrl("https://maps.googleapis.com/maps/api/distancematrix/json")
+                    .queryParam("origins", origin)
+                    .queryParam("destinations", destinations)
+                    .queryParam("key", apiKey)
+                    .queryParam("mode", "driving")
+                    .build()
+                    .toUriString();
+
+            try {
+                ResponseEntity<DistanceMatrixResponse> response = restTemplate.exchange(
+                        url,
+                        HttpMethod.GET,
+                        null,
+                        new ParameterizedTypeReference<>() {}
+                );
+
+                DistanceMatrixResponse matrix = response.getBody();
+
+                if (matrix != null && matrix.getRows() != null && !matrix.getRows().isEmpty()) {
+                    List<DistanceMatrixElement> elements = matrix.getRows().get(0).getElements();
+
+                    for (int j = 0; j < elements.size(); j++) {
+                        DistanceMatrixElement element = elements.get(j);
+                        if ("OK".equals(element.getStatus())) {
+                            double distanceKm = element.getDistance().getValue() / 1000.0;
+                            distanceMap.put(batch.get(j).getId(), distanceKm);
+                        } else {
+                            distanceMap.put(batch.get(j).getId(), Double.MAX_VALUE); // fallback distance
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                System.err.println("Erro ao consultar a Distance Matrix API: " + e.getMessage());
+                // Optionally: add fallback value
+                for (PostoCoordenadasDTO p : batch) {
+                    distanceMap.put(p.getId(), Double.MAX_VALUE);
+                }
             }
         }
 
